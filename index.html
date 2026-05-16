@@ -12,7 +12,6 @@
     <meta property="og:url" content="https://thaihuynhquang.github.io/ml-journey-tracker/" />
     <meta name="twitter:card" content="summary" />
     <title>ML Engineer Journey Tracker</title>
-    <link rel="stylesheet" href="styles.css" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E" />
   </head>
   <body>
@@ -54,18 +53,17 @@
     </header>
 
     <main class="container">
-      <section id="view-dashboard" class="view active"></section>
-      <section id="view-phases" class="view"></section>
-      <section id="view-job" class="view"></section>
-      <section id="view-costs" class="view"></section>
-      <section id="view-resources" class="view"></section>
-      <section id="view-risks" class="view"></section>
-      <section id="view-routine" class="view"></section>
+      <ml-view-dashboard id="view-dashboard" class="view active"></ml-view-dashboard>
+      <ml-view-phases id="view-phases" class="view"></ml-view-phases>
+      <ml-view-job id="view-job" class="view"></ml-view-job>
+      <ml-view-costs id="view-costs" class="view"></ml-view-costs>
+      <ml-view-resources id="view-resources" class="view"></ml-view-resources>
+      <ml-view-risks id="view-risks" class="view"></ml-view-risks>
+      <ml-view-routine id="view-routine" class="view"></ml-view-routine>
     </main>
 
     <div class="toast" id="toast"></div>
 
-    <script src="data.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

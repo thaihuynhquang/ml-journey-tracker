@@ -1,4 +1,4 @@
-window.PLAN_DATA = {
+export const PLAN_DATA = {
   meta: {
     title: "ML Engineer Journey",
     subtitle: "Frontend → AI/ML Engineer + Google Pro ML Engineer Cert",
