@@ -1132,6 +1132,244 @@ a:hover {
   line-height: 1.45;
 }
 
+.cost-option-static {
+  cursor: default;
+}
+
+.cost-option-static:hover {
+  border-color: var(--success);
+}
+
+/* RESOURCES */
+.resource-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.resource-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.resource-filter-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  min-width: 48px;
+}
+
+.filter-chip {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.filter-chip:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.filter-chip.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.resource-summary {
+  margin-bottom: 24px;
+}
+
+.resource-summary-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+.resource-summary-stats strong {
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.resource-category {
+  margin-bottom: 28px;
+}
+
+.resource-category-title {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.resource-count {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.resource-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  transition: box-shadow var(--transition);
+}
+
+.resource-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.resource-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.resource-card-header a {
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.resource-card-header a:hover {
+  text-decoration: underline;
+}
+
+.resource-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.resource-badge.free {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.resource-badge.paid {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.resource-badge.owned {
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+
+.resource-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.resource-phase-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.resource-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.resource-card-blocked {
+  border-color: var(--danger, #c44);
+  opacity: 0.92;
+}
+
+.resource-user-chip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.resource-user-chip.verified {
+  background: rgba(34, 139, 87, 0.15);
+  color: #1a7a4a;
+}
+
+[data-theme="dark"] .resource-user-chip.verified {
+  color: #5dd39e;
+}
+
+.resource-user-chip.blocked {
+  background: rgba(196, 68, 68, 0.12);
+  color: #b33;
+}
+
+[data-theme="dark"] .resource-user-chip.blocked {
+  color: #f08080;
+}
+
+.resource-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.resource-action-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.resource-action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.resource-action-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .header-inner {
