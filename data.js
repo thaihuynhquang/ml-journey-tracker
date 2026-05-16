@@ -245,7 +245,7 @@ window.PLAN_DATA = {
         fallbacks: [
           { failure: "Overwhelmed bởi DL", action: "Focus 1 framework (PyTorch), drop RNN/Attention tạm. Cert chỉ test concept" },
           { failure: "RAM/GPU không đủ", action: "Dùng Google Colab free (T4 GPU) hoặc Kaggle Notebook (30h GPU/tuần free)" },
-          { failure: "Project GenAI quá khó", action: "Skip RAG, làm Transformer fine-tune đơn giản hơn. Quay lại RAG ở Phase 4" },
+          { failure: "Project GenAI quá khó", action: "Skip RAG, làm Transformer fine-tune đơn giản hơn. Quay lại RAG ở Phase 3" },
         ],
       },
     },
