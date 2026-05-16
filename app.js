@@ -23,9 +23,32 @@
     return {
       checked: {},
       notes: {},
-      costOption: "optimal",
+      costOption: "recommended",
       startDate: data.meta.startDate,
+      dailyHours: data.meta.dailyHours,
+      daysPerWeek: data.meta.daysPerWeek,
     };
+  }
+
+  const COST_OPTION_MIGRATION = {
+    optimal: "recommended",
+    budget: "minimal",
+    medium: "full",
+  };
+
+  function normalizeState() {
+    if (COST_OPTION_MIGRATION[state.costOption]) {
+      state.costOption = COST_OPTION_MIGRATION[state.costOption];
+    }
+    if (!data.costs.options.some((o) => o.id === state.costOption)) {
+      state.costOption = "recommended";
+    }
+    if (typeof state.dailyHours !== "number" || state.dailyHours < 1) {
+      state.dailyHours = data.meta.dailyHours;
+    }
+    if (typeof state.daysPerWeek !== "number" || state.daysPerWeek < 1) {
+      state.daysPerWeek = data.meta.daysPerWeek;
+    }
   }
 
   function saveState() {
@@ -80,11 +103,42 @@
   }
 
   function getCurrentWeek() {
-    const start = new Date(state.startDate);
+    const start = new Date(state.startDate + "T00:00:00");
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const diffMs = today - start;
     const weekNum = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
     return Math.max(1, Math.min(weekNum, data.meta.totalWeeks));
+  }
+
+  function getWeeklyHours() {
+    return state.dailyHours * state.daysPerWeek;
+  }
+
+  function getCalendarWeeksNeeded() {
+    const weekly = getWeeklyHours();
+    if (!weekly) return data.meta.totalWeeks;
+    return Math.ceil(data.meta.totalHours / weekly);
+  }
+
+  function getProjectedEndDate() {
+    const start = new Date(state.startDate + "T00:00:00");
+    const end = new Date(start);
+    end.setDate(end.getDate() + getCalendarWeeksNeeded() * 7);
+    return end;
+  }
+
+  function formatDate(d) {
+    return d.toLocaleDateString("vi-VN", { year: "numeric", month: "short", day: "numeric" });
+  }
+
+  function resetScheduleDefaults() {
+    state.startDate = data.meta.startDate;
+    state.dailyHours = data.meta.dailyHours;
+    state.daysPerWeek = data.meta.daysPerWeek;
+    saveState();
+    renderAll();
+    showToast("Đã đặt lại lịch học mặc định");
   }
 
   function getCurrentPhase() {
@@ -125,6 +179,10 @@
     const currentWeek = getCurrentWeek();
     const currentPhase = getCurrentPhase();
     const passedCheckpoints = data.phases.filter((p) => p.checkpoint && getCheckpointProgress(p.checkpoint).passed).length;
+    const weeklyHours = getWeeklyHours();
+    const calendarWeeks = getCalendarWeeksNeeded();
+    const projectedEnd = getProjectedEndDate();
+    const restDays = 7 - state.daysPerWeek;
 
     const phaseCards = data.phases
       .map((phase) => {
@@ -187,7 +245,44 @@
             <div class="value">${passedCheckpoints}/${data.phases.length}</div>
             <div class="sub">đã pass</div>
           </div>
+          <div class="hero-stat">
+            <div class="label">Cường độ</div>
+            <div class="value" style="font-size:1.2rem;line-height:1.4;">${weeklyHours}h/tuần</div>
+            <div class="sub">${state.dailyHours}h × ${state.daysPerWeek} ngày</div>
+          </div>
         </div>
+      </div>
+
+      <div class="card schedule-settings">
+        <h3>Cài đặt lịch học</h3>
+        <div class="schedule-grid">
+          <div class="schedule-field">
+            <label for="start-date">Ngày bắt đầu</label>
+            <input type="date" id="start-date" value="${escapeHtml(state.startDate)}" />
+          </div>
+          <div class="schedule-field">
+            <label for="daily-hours">Giờ học mỗi ngày</label>
+            <input type="number" id="daily-hours" min="1" max="12" step="0.5" value="${state.dailyHours}" />
+          </div>
+          <div class="schedule-field">
+            <label for="days-per-week">Ngày học / tuần</label>
+            <select id="days-per-week">
+              ${[3, 4, 5, 6, 7]
+                .map(
+                  (d) =>
+                    `<option value="${d}" ${d === state.daysPerWeek ? "selected" : ""}>${d} ngày</option>`
+                )
+                .join("")}
+            </select>
+          </div>
+        </div>
+        <div class="schedule-summary">
+          <span><strong>${weeklyHours}h</strong> / tuần</span>
+          <span><strong>${calendarWeeks}</strong> tuần lịch (≈ ${data.meta.totalHours}h curriculum)</span>
+          <span>Dự kiến xong: <strong>${formatDate(projectedEnd)}</strong></span>
+          <span>${state.daysPerWeek} ngày học + <strong>${restDays}</strong> ngày nghỉ</span>
+        </div>
+        <button type="button" class="schedule-reset-btn" id="schedule-reset-btn">Quay lại mặc định</button>
       </div>
 
       <div class="card-section-title">Phases Overview</div>
@@ -205,6 +300,42 @@
         switchTab("phases");
       });
     });
+
+    const startDateEl = document.getElementById("start-date");
+    const dailyHoursEl = document.getElementById("daily-hours");
+    const daysPerWeekEl = document.getElementById("days-per-week");
+    const scheduleResetEl = document.getElementById("schedule-reset-btn");
+
+    if (startDateEl) {
+      startDateEl.addEventListener("change", (e) => {
+        if (!e.target.value) return;
+        state.startDate = e.target.value;
+        saveState();
+        renderAll();
+      });
+    }
+
+    if (dailyHoursEl) {
+      dailyHoursEl.addEventListener("change", (e) => {
+        const val = parseFloat(e.target.value);
+        if (!val || val < 1) return;
+        state.dailyHours = Math.min(12, val);
+        saveState();
+        renderAll();
+      });
+    }
+
+    if (daysPerWeekEl) {
+      daysPerWeekEl.addEventListener("change", (e) => {
+        state.daysPerWeek = parseInt(e.target.value, 10);
+        saveState();
+        renderAll();
+      });
+    }
+
+    if (scheduleResetEl) {
+      scheduleResetEl.addEventListener("click", resetScheduleDefaults);
+    }
   }
 
   function renderPhases() {
@@ -411,9 +542,16 @@
   }
 
   function renderCosts() {
-    const costsHtml = data.costs.options
+    const sortedOptions = [...data.costs.options].sort((a, b) => {
+      if (a.id === "recommended") return -1;
+      if (b.id === "recommended") return 1;
+      return 0;
+    });
+
+    const costsHtml = sortedOptions
       .map((opt) => {
         const selected = state.costOption === opt.id;
+        const isRecommended = opt.id === "recommended";
         const itemsHtml = opt.items
           .map(
             (it) => `
@@ -428,9 +566,10 @@
           )
           .join("");
         return `
-          <div class="cost-option ${selected ? "selected" : ""}" data-cost-id="${opt.id}">
-            <h4>${escapeHtml(opt.title)}</h4>
+          <div class="cost-option ${selected ? "selected" : ""} ${isRecommended ? "cost-option-recommended" : ""}" data-cost-id="${opt.id}">
+            <h4>${escapeHtml(opt.title)}${isRecommended ? '<span class="cost-recommended-badge">Recommended</span>' : ""}</h4>
             <div class="cost-total">$${opt.total} <span class="currency">USD</span></div>
+            ${opt.netNote ? `<p class="cost-net-note">${escapeHtml(opt.netNote)}</p>` : ""}
             <ul class="cost-items">${itemsHtml}</ul>
           </div>
         `;
@@ -440,7 +579,7 @@
     document.getElementById("view-costs").innerHTML = `
       <div class="phase-header">
         <h2>Chi phí đầu tư</h2>
-        <p class="subtitle">3 lựa chọn — click để chọn option phù hợp với bạn</p>
+        <p class="subtitle">3 lựa chọn — mặc định Innovators Plus $299 (tiết kiệm nhất). Click để chọn.</p>
       </div>
       <div class="cost-options">${costsHtml}</div>
 
@@ -466,7 +605,7 @@
     document.getElementById("view-risks").innerHTML = `
       <div class="phase-header">
         <h2>Rủi ro & Fallback chiến lược</h2>
-        <p class="subtitle">5 rủi ro lớn nhất và cách xử lý</p>
+        <p class="subtitle">${data.risks.length} rủi ro lớn nhất và cách xử lý</p>
       </div>
       ${data.risks
         .map(
@@ -492,7 +631,7 @@
     document.getElementById("view-routine").innerHTML = `
       <div class="phase-header">
         <h2>Weekly Routine</h2>
-        <p class="subtitle">${data.meta.dailyHours}h/ngày, 5 ngày học + 1 project + 1 rest</p>
+        <p class="subtitle">${state.dailyHours}h/ngày, ${state.daysPerWeek} ngày học + ${7 - state.daysPerWeek} ngày nghỉ · ${getWeeklyHours()}h/tuần</p>
       </div>
       <table class="routine-table">
         <thead>
@@ -565,6 +704,7 @@
       try {
         const imported = JSON.parse(e.target.result);
         Object.assign(state, imported);
+        normalizeState();
         saveState();
         renderAll();
         showToast("Đã import progress");
@@ -603,6 +743,7 @@
   }
 
   function init() {
+    normalizeState();
     const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     applyTheme(savedTheme);
 
